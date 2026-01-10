@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prompt Generator</title>
+    <style>
+      /* CSS Variables for theming */
+      :root {
+        --transition: all 0.3s ease;
+      }
+
+      /* Dark theme (default) */
+      [data-theme="dark"] {
+        --bg-primary: #0b1020;
+        --bg-secondary: #111a33;
+        --bg-input: #0c1329;
+        --text-primary: #e6e9f2;
+        --text-secondary: #b8c0d9;
+        --border-color: rgba(255, 255, 255, 0.12);
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --accent-primary: #6c7cff;
+        --accent-hover: #5a6de8;
+        --accent-text: #0b1020;
+        --error-color: #ffb3b3;
+        --shadow: rgba(0, 0, 0, 0.3);
+      }
+
+      /* Light theme */
+      [data-theme="light"] {
+        --bg-primary: #f5f7fa;
+        --bg-secondary: #ffffff;
+        --bg-input: #ffffff;
+        --text-primary: #1a202c;
+        --text-secondary: #4a5568;
+        --border-color: rgba(0, 0, 0, 0.12);
+        --border-subtle: rgba(0, 0, 0, 0.08);
+        --accent-primary: #6c7cff;
+        --accent-hover: #5a6de8;
+        --accent-text: #ffffff;
+        --error-color: #e53e3e;
+        --shadow: rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      }
+
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        margin: 0;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 16px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+
+      .theme-toggle {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-subtle);
+        border-radius: 24px;
+        padding: 6px;
+        display: flex;
+        gap: 4px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .theme-toggle button {
+        background: transparent;
+        border: 0;
+        padding: 8px 12px;
+        border-radius: 18px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .theme-toggle button.active {
+        background: var(--accent-primary);
+        color: var(--accent-text);
+      }
+
+      .theme-toggle button:hover:not(.active) {
+        color: var(--text-primary);
+      }
+
+      .icon {
+        font-size: 16px;
+      }
+
+      .card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 12px var(--shadow);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin: 10px 0 6px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        box-sizing: border-box;
+        background: var(--bg-input);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-family: inherit;
+        font-size: 14px;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(108, 124, 255, 0.1);
+      }
+
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+
+      button {
+        background: var(--accent-primary);
+        border: 0;
+        color: var(--accent-text);
+        font-weight: 700;
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: var(--transition);
+      }
+
+      button:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(108, 124, 255, 0.3);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+
+      button.secondary:hover {
+        background: var(--bg-input);
+        border-color: var(--accent-primary);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px var(--shadow);
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+
+      .out {
+        margin-top: 14px;
+      }
+
+      .out textarea {
+        min-height: 220px;
+      }
+
+      .hint {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        font-style: italic;
+      }
+
+      .error {
+        color: var(--error-color);
+        font-size: 13px;
+        margin-top: 10px;
+        font-weight: 600;
+      }
+
+      @media (max-width: 860px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body data-theme="dark">
+    <div class="wrap">
+      <div class="header">
+        <h1>Prompt Generator</h1>
+        <div class="theme-toggle">
+          <button id="theme-dark" class="active">
+            <span class="icon">🌙</span>
+            <span>Dark</span>
+          </button>
+          <button id="theme-light">
+            <span class="icon">☀️</span>
+            <span>Light</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <div>
+            <label for="target">Target</label>
+            <select id="target">
+              <option value="chatgpt">ChatGPT</option>
+              <option value="claude_code">Claude Code</option>
+            </select>
+          </div>
+          <div>
+            <label for="tone">Tone (optional)</label>
+            <input id="tone" placeholder="e.g. concise, direct" />
+          </div>
+        </div>
+
+        <label for="task">Task (required)</label>
+        <textarea id="task" placeholder="What do you want the model to do?"></textarea>
+
+        <div class="row">
+          <div>
+            <label for="context">Context</label>
+            <textarea id="context" placeholder="Important background, codebase details, current behavior..."></textarea>
+          </div>
+          <div>
+            <label for="constraints">Constraints</label>
+            <textarea id="constraints" placeholder="Restrictions, tech stack, performance, style rules..."></textarea>
+          </div>
+        </div>
+
+        <label for="deliverables">Deliverables</label>
+        <textarea id="deliverables" placeholder="What the output must include (files changed, endpoints, tests, etc.)"></textarea>
+
+        <div class="actions">
+          <button id="generate">Generate</button>
+          <button class="secondary" id="copy">Copy</button>
+          <span class="hint">Tip: Keep Task short; push specifics into Context/Constraints.</span>
+        </div>
+        <div class="error" id="error" style="display:none"></div>
+
+        <div class="out">
+          <label for="output">Generated prompt</label>
+          <textarea id="output" readonly></textarea>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme management
+      const themeState = {
+        current: localStorage.getItem('theme') || 'dark',
+        toggle(theme) {
+          this.current = theme;
+          localStorage.setItem('theme', theme);
+          document.body.setAttribute('data-theme', theme);
+          this.updateButtons();
+        },
+        updateButtons() {
+          const darkBtn = document.getElementById('theme-dark');
+          const lightBtn = document.getElementById('theme-light');
+
+          if (this.current === 'dark') {
+            darkBtn.classList.add('active');
+            lightBtn.classList.remove('active');
+          } else {
+            darkBtn.classList.remove('active');
+            lightBtn.classList.add('active');
+          }
+        },
+        init() {
+          document.body.setAttribute('data-theme', this.current);
+          this.updateButtons();
+        }
+      };
+
+      // Initialize theme
+      themeState.init();
+
+      // Theme toggle listeners
+      document.getElementById('theme-dark').addEventListener('click', () => {
+        themeState.toggle('dark');
+      });
+
+      document.getElementById('theme-light').addEventListener('click', () => {
+        themeState.toggle('light');
+      });
+
+      // Form elements
+      const els = {
+        target: document.getElementById('target'),
+        tone: document.getElementById('tone'),
+        task: document.getElementById('task'),
+        context: document.getElementById('context'),
+        constraints: document.getElementById('constraints'),
+        deliverables: document.getElementById('deliverables'),
+        generate: document.getElementById('generate'),
+        copy: document.getElementById('copy'),
+        output: document.getElementById('output'),
+        error: document.getElementById('error'),
+      };
+
+      function setError(msg) {
+        if (!msg) {
+          els.error.style.display = 'none';
+          els.error.textContent = '';
+          return;
+        }
+        els.error.style.display = 'block';
+        els.error.textContent = msg;
+      }
+
+      async function generate() {
+        setError('');
+        els.generate.disabled = true;
+        els.generate.textContent = 'Generating...';
+
+        try {
+          const payload = {
+            target: els.target.value,
+            tone: els.tone.value,
+            task: els.task.value,
+            context: els.context.value,
+            constraints: els.constraints.value,
+            deliverables: els.deliverables.value,
+          };
+
+          const res = await fetch('/api/v1/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            setError(data.error || 'Failed to generate prompt');
+            return;
+          }
+          els.output.value = data.prompt || '';
+        } catch (e) {
+          setError('Network error: Cannot connect to server');
+        } finally {
+          els.generate.disabled = false;
+          els.generate.textContent = 'Generate';
+        }
+      }
+
+      async function copy() {
+        const text = els.output.value;
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          const originalText = els.copy.textContent;
+          els.copy.textContent = 'Copied!';
+          setTimeout(() => {
+            els.copy.textContent = originalText;
+          }, 2000);
+        } catch (e) {
+          setError('Copy failed. Select the text and copy manually.');
+        }
+      }
+
+      els.generate.addEventListener('click', generate);
+      els.copy.addEventListener('click', copy);
+
+      // Allow Enter key to generate (with Ctrl/Cmd modifier)
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          generate();
+        }
+      });
+    </script>
+  </body>
+</html>

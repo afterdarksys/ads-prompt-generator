@@ -17,7 +17,10 @@ from werkzeug.exceptions import HTTPException
 from config import config
 from errors import PromptGeneratorError, RateLimitError, ValidationError
 from logging_config import get_logger, setup_logging
+from models import init_db
 from prompt_gen.core import PromptRequest, PromptTarget, generate_prompt
+from routes_library import library_bp
+from routes_playground import keys_bp, playground_bp
 from validation import validate_generate_request
 
 # Setup logging
@@ -40,6 +43,9 @@ def create_app() -> Flask:
         JSON_SORT_KEYS=False,
     )
 
+    # Initialize database
+    init_db()
+
     # Initialize extensions
     _setup_security(app)
     _setup_caching(app)
@@ -48,6 +54,11 @@ def create_app() -> Flask:
     _setup_error_handlers(app)
     _setup_request_handlers(app)
     _setup_routes(app)
+
+    # Register blueprints
+    app.register_blueprint(library_bp)
+    app.register_blueprint(playground_bp)
+    app.register_blueprint(keys_bp)
 
     log.info(
         "application_started",

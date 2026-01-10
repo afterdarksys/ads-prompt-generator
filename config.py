@@ -44,6 +44,12 @@ class Config:
     # CORS
     CORS_ORIGINS: list[str] = os.getenv("CORS_ORIGINS", "*").split(",")
 
+    # Database
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./prompt_generator.db")
+
+    # Encryption (for API keys)
+    ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", SECRET_KEY)
+
     @classmethod
     def validate(cls) -> None:
         """Validate configuration values."""

@@ -36,3 +36,14 @@ safety==3.2.8
 
 # CLI dependencies
 pyperclip==1.9.0
+
+# Database
+sqlalchemy==2.0.35
+
+# Encryption
+cryptography==44.0.0
+
+# AI Providers
+anthropic==0.39.0
+openai==1.54.5
+httpx==0.27.2
