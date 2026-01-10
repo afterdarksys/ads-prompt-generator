@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prompt Generator</title>
+    <style>
+      body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin: 0; background: #0b1020; color: #e6e9f2; }
+      .wrap { max-width: 980px; margin: 0 auto; padding: 32px 16px; }
+      .card { background: #111a33; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      label { display:block; font-size: 12px; color: #b8c0d9; margin: 10px 0 6px; }
+      input, textarea, select { width: 100%; box-sizing: border-box; background: #0c1329; color: #e6e9f2; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 12px; }
+      textarea { min-height: 96px; resize: vertical; }
+      button { background: #6c7cff; border: 0; color: #0b1020; font-weight: 700; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+      button.secondary { background: transparent; color: #e6e9f2; border: 1px solid rgba(255,255,255,0.18); }
+      .actions { display:flex; gap: 10px; align-items:center; margin-top: 12px; }
+      .out { margin-top: 14px; }
+      .out textarea { min-height: 220px; }
+      .hint { font-size: 12px; color: #b8c0d9; margin-top: 8px; }
+      .error { color: #ffb3b3; font-size: 13px; margin-top: 10px; }
+      @media (max-width: 860px) { .row { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1 style="margin:0 0 12px">Prompt Generator</h1>
+      <div class="card">
+        <div class="row">
+          <div>
+            <label for="target">Target</label>
+            <select id="target">
+              <option value="chatgpt">ChatGPT</option>
+              <option value="claude_code">Claude Code</option>
+            </select>
+          </div>
+          <div>
+            <label for="tone">Tone (optional)</label>
+            <input id="tone" placeholder="e.g. concise, direct" />
+          </div>
+        </div>
+
+        <label for="task">Task (required)</label>
+        <textarea id="task" placeholder="What do you want the model to do?"></textarea>
+
+        <div class="row">
+          <div>
+            <label for="context">Context</label>
+            <textarea id="context" placeholder="Important background, codebase details, current behavior..."></textarea>
+          </div>
+          <div>
+            <label for="constraints">Constraints</label>
+            <textarea id="constraints" placeholder="Restrictions, tech stack, performance, style rules..."></textarea>
+          </div>
+        </div>
+
+        <label for="deliverables">Deliverables</label>
+        <textarea id="deliverables" placeholder="What the output must include (files changed, endpoints, tests, etc.)"></textarea>
+
+        <div class="actions">
+          <button id="generate">Generate</button>
+          <button class="secondary" id="copy">Copy</button>
+          <span class="hint">Tip: Keep Task short; push specifics into Context/Constraints.</span>
+        </div>
+        <div class="error" id="error" style="display:none"></div>
+
+        <div class="out">
+          <label for="output">Generated prompt</label>
+          <textarea id="output" readonly></textarea>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const els = {
+        target: document.getElementById('target'),
+        tone: document.getElementById('tone'),
+        task: document.getElementById('task'),
+        context: document.getElementById('context'),
+        constraints: document.getElementById('constraints'),
+        deliverables: document.getElementById('deliverables'),
+        generate: document.getElementById('generate'),
+        copy: document.getElementById('copy'),
+        output: document.getElementById('output'),
+        error: document.getElementById('error'),
+      };
+
+      function setError(msg) {
+        if (!msg) {
+          els.error.style.display = 'none';
+          els.error.textContent = '';
+          return;
+        }
+        els.error.style.display = 'block';
+        els.error.textContent = msg;
+      }
+
+      async function generate() {
+        setError('');
+        const payload = {
+          target: els.target.value,
+          tone: els.tone.value,
+          task: els.task.value,
+          context: els.context.value,
+          constraints: els.constraints.value,
+          deliverables: els.deliverables.value,
+        };
+
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setError(data.error || 'Failed to generate prompt');
+          return;
+        }
+        els.output.value = data.prompt || '';
+      }
+
+      async function copy() {
+        const text = els.output.value;
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {
+          setError('Copy failed. Select the text and copy manually.');
+        }
+      }
+
+      els.generate.addEventListener('click', generate);
+      els.copy.addEventListener('click', copy);
+    </script>
+  </body>
+</html>

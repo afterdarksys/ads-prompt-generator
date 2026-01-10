@@ -1,0 +1,283 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Prompt Generator API",
+    "version": "1.0.0",
+    "description": "Enterprise-grade API for generating structured prompts for ChatGPT and Claude Code",
+    "contact": {
+      "name": "API Support"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local development server"
+    },
+    {
+      "url": "https://prompt-generator.example.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "description": "Returns the health status of the application",
+        "operationId": "getHealth",
+        "tags": ["Monitoring"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "summary": "Readiness check",
+        "description": "Returns the readiness status and dependency health checks",
+        "operationId": "getReady",
+        "tags": ["Monitoring"],
+        "responses": {
+          "200": {
+            "description": "Service is ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service is not ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/generate": {
+      "post": {
+        "summary": "Generate a prompt",
+        "description": "Generate a structured prompt based on user input for ChatGPT or Claude Code",
+        "operationId": "generatePrompt",
+        "tags": ["Prompt Generation"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateRequest"
+              },
+              "examples": {
+                "minimal": {
+                  "summary": "Minimal request",
+                  "value": {
+                    "task": "Summarize this article",
+                    "target": "chatgpt"
+                  }
+                },
+                "full": {
+                  "summary": "Full request with all fields",
+                  "value": {
+                    "task": "Add user authentication to the API",
+                    "target": "claude_code",
+                    "context": "Flask application with PostgreSQL database",
+                    "constraints": "Use JWT tokens, must be backwards compatible",
+                    "deliverables": "Updated endpoints, migration scripts, tests",
+                    "tone": "concise and technical"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Prompt generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Unique request identifier for tracking",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GenerateRequest": {
+        "type": "object",
+        "required": ["task"],
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": ["chatgpt", "claude_code"],
+            "default": "chatgpt",
+            "description": "Target AI model for the prompt"
+          },
+          "task": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10240,
+            "description": "The main task or question (required)"
+          },
+          "context": {
+            "type": "string",
+            "maxLength": 51200,
+            "description": "Background information, codebase details, current state"
+          },
+          "constraints": {
+            "type": "string",
+            "maxLength": 51200,
+            "description": "Restrictions, limitations, requirements"
+          },
+          "deliverables": {
+            "type": "string",
+            "maxLength": 51200,
+            "description": "Expected outputs, what the result should include"
+          },
+          "tone": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Desired tone of the response (e.g., concise, detailed)"
+          }
+        }
+      },
+      "GenerateResponse": {
+        "type": "object",
+        "required": ["prompt", "cached"],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "The generated prompt text"
+          },
+          "cached": {
+            "type": "boolean",
+            "description": "Whether this response was served from cache"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status", "version"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["healthy"],
+            "description": "Health status"
+          },
+          "version": {
+            "type": "string",
+            "description": "Application version"
+          }
+        }
+      },
+      "ReadyResponse": {
+        "type": "object",
+        "required": ["status", "checks"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ready", "not_ready"],
+            "description": "Readiness status"
+          },
+          "checks": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "description": "Health check results for dependencies"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Request identifier for tracking"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional error details (validation errors, etc.)"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Prompt Generation",
+      "description": "Generate structured prompts for AI models"
+    },
+    {
+      "name": "Monitoring",
+      "description": "Health and readiness endpoints"
+    }
+  ]
+}
