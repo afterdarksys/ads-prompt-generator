@@ -12,11 +12,21 @@ Generate structured, high-quality prompts with context, constraints, and deliver
 
 ### Core Functionality
 - 🎯 **Two Target AI Models**: ChatGPT and Claude Code optimized prompts
-- 🌐 **Web Interface**: Beautiful, responsive UI for interactive prompt generation
+- 🌐 **Web Interface**: Beautiful, responsive UI with dark/light theme
 - 💻 **CLI Tool**: Command-line interface with interactive console mode
 - 📝 **Structured Prompts**: Organize prompts with task, context, constraints, deliverables, and tone
 
-### Enterprise Features (NEW!)
+### NEW: Advanced Features 🚀
+- 🎮 **Prompt Playground**: Test prompts with real AI models (Anthropic, OpenAI, OpenRouter)
+- 📚 **Prompt Library**: Save, organize, and reuse your best prompts
+- 🔑 **Bring Your Own Key (BYOK)**: Securely store and manage API keys
+- 🔌 **Detached Mode**: Generate prompts without API integration
+- 🔐 **Encrypted Storage**: API keys encrypted at rest with Fernet
+- 🏷️ **Tag System**: Organize prompts with custom tags
+- ⭐ **Favorites**: Mark and filter your most-used prompts
+- 📊 **Usage Metrics**: Track tokens used and response times
+
+### Enterprise Features
 - 🔒 **Production-Ready Security**: HTTPS, CSP, CORS, rate limiting, input validation
 - 📊 **Monitoring & Metrics**: Prometheus metrics, structured logging, health checks
 - 🚀 **High Performance**: Redis caching, Gunicorn workers, auto-scaling ready
@@ -153,6 +163,88 @@ Available commands:
   exit/quit        Exit console
 ```
 
+### Prompt Playground 🎮
+
+Test your prompts with real AI models directly in the browser:
+
+1. **Navigate to Playground tab**
+2. **Select Provider**:
+   - **Detached Mode**: Generate prompts without API calls (default)
+   - **Anthropic Claude**: Claude 3.5 Sonnet, Haiku, Opus
+   - **OpenAI**: GPT-4o, GPT-4o-mini, GPT-4 Turbo
+   - **OpenRouter**: Access to multiple models
+
+3. **Add API Key** (for non-detached mode):
+   - Go to "API Keys" tab and add your keys
+   - Or enter key inline (not saved)
+
+4. **Test Your Prompt**:
+   - Enter prompt text
+   - Click "Execute"
+   - View response with token usage and timing
+
+**Example Use Cases:**
+- Test different prompt variations
+- Compare model responses
+- Verify prompt effectiveness before production use
+- Debug prompt issues in real-time
+
+### Prompt Library 📚
+
+Save and organize your prompts for reuse:
+
+**Saving Prompts:**
+1. Generate a prompt in the Generator tab
+2. Click "Save to Library"
+3. Prompt is automatically saved with metadata
+
+**Managing Library:**
+- **Search**: Find prompts by name, description, or content
+- **Filter**: Show only favorites
+- **Tags**: Organize with custom tags
+- **View Details**: Click any prompt to see full content
+- **Copy**: One-click copy to clipboard
+- **Delete**: Remove prompts you no longer need
+
+**Example Workflow:**
+```
+1. Create prompt: "Add authentication to Flask API"
+2. Save to library with tags: ["authentication", "flask", "api"]
+3. Mark as favorite for quick access
+4. Later: Search "auth" → Find prompt → Copy → Use
+```
+
+### API Key Management 🔑
+
+Securely store API keys for use in Playground:
+
+**Adding Keys:**
+1. Go to "API Keys" tab
+2. Select provider (Anthropic, OpenAI, OpenRouter)
+3. Enter key name (e.g., "My Claude Key")
+4. Paste API key
+5. Click "Add Key"
+
+**Security:**
+- Keys encrypted at rest using Fernet (AES)
+- Keys never logged or exposed in API responses
+- Only you can access your keys
+- Delete keys anytime
+
+**Using Stored Keys:**
+- In Playground, select from "Stored API Key" dropdown
+- No need to re-enter keys each time
+- Switch between multiple keys easily
+
+**Environment Variables:**
+```bash
+# Set encryption key (important!)
+export ENCRYPTION_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
+
+# Database location
+export DATABASE_URL=sqlite:///./prompt_generator.db
+```
+
 ## API Documentation
 
 RESTful API for integration with other tools.
@@ -181,6 +273,81 @@ Generate a prompt from JSON input.
   "cached": false
 }
 ```
+
+#### `GET/POST /api/v1/library/prompts`
+List or create saved prompts.
+
+**Query Parameters** (GET):
+- `search`: Search by name/description/task
+- `tag`: Filter by tag
+- `favorites`: Show only favorites (true/false)
+- `limit`: Max results (default: 50)
+- `offset`: Pagination offset
+
+**Request** (POST):
+```json
+{
+  "name": "Auth Implementation",
+  "task": "Add JWT authentication",
+  "target": "claude_code",
+  "tags": ["auth", "security"],
+  "is_favorite": false
+}
+```
+
+#### `GET/PUT/DELETE /api/v1/library/prompts/:id`
+Get, update, or delete a specific prompt.
+
+#### `POST /api/v1/library/prompts/:id/favorite`
+Toggle favorite status of a prompt.
+
+#### `GET /api/v1/library/tags`
+Get all unique tags from saved prompts.
+
+#### `GET/POST /api/v1/keys`
+List or create API keys.
+
+**Request** (POST):
+```json
+{
+  "provider": "anthropic",
+  "key_name": "My Claude Key",
+  "api_key": "sk-ant-..."
+}
+```
+
+#### `DELETE /api/v1/keys/:id`
+Delete an API key.
+
+#### `GET /api/v1/playground/providers`
+List available AI providers and their models.
+
+#### `POST /api/v1/playground/execute`
+Execute a prompt with an AI provider.
+
+**Request:**
+```json
+{
+  "provider": "anthropic",
+  "model": "claude-3-5-sonnet-20241022",
+  "prompt": "Explain quantum computing",
+  "key_id": 1  // or "api_key": "sk-..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "response": "Quantum computing...",
+  "model": "claude-3-5-sonnet-20241022",
+  "tokens_used": 250,
+  "duration_ms": 1523
+}
+```
+
+#### `GET /api/v1/playground/history`
+Get playground execution history.
 
 #### `GET /health`
 Health check endpoint for load balancers.
