@@ -1,5 +1,7 @@
 # Prompt Generator
 
+[![PyPI version](https://badge.fury.io/py/afterdark-prompt-generator.svg)](https://pypi.org/project/afterdark-prompt-generator/)
+[![Downloads](https://pepy.tech/badge/afterdark-prompt-generator)](https://pepy.tech/project/afterdark-prompt-generator)
 [![CI/CD Pipeline](https://github.com/yourorg/prompt-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/yourorg/prompt-generator/actions)
 [![codecov](https://codecov.io/gh/yourorg/prompt-generator/branch/main/graph/badge.svg)](https://codecov.io/gh/yourorg/prompt-generator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
