@@ -3,9 +3,23 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "prompt-generator"
+name = "afterdark-prompt-generator"
 version = "1.0.0"
-description = "Enterprise-grade prompt generator for ChatGPT and Claude Code (Flask app + CLI)"
+description = "Enterprise-grade prompt generator for ChatGPT and Claude Code with team collaboration features"
+readme = "README.md"
+authors = [
+    {name = "AfterDark", email = "security@afterdark.tech"}
+]
+license = {text = "MIT"}
+keywords = ["prompt", "generator", "ai", "chatgpt", "claude", "collaboration"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 requires-python = ">=3.10"
 dependencies = [
     "Flask>=3.0.3",
@@ -33,6 +47,9 @@ dev = [
 
 [project.scripts]
 prompt-gen = "prompt_gen.cli:main"
+
+[tool.setuptools]
+packages = ["prompt_gen"]
 
 [tool.ruff]
 line-length = 100
