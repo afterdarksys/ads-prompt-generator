@@ -1,0 +1,36 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies for security tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js for promptfoo
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g promptfoo
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install security tools
+RUN pip install --no-cache-dir \
+    adversarial-robustness-toolbox \
+    garak \
+    pyrit \
+    celery[redis]
+
+# Copy worker code
+COPY api/workers/ /app/workers/
+
+# Create non-root user
+RUN useradd -m -u 1000 secworker && chown -R secworker:secworker /app
+USER secworker
+
+CMD ["celery", "-A", "workers.tasks", "worker", "--loglevel=info"]

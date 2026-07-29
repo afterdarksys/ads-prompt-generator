@@ -5,56 +5,39 @@ __pycache__/
 *.so
 .Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+.eggs/
 
-# Virtual Environment
-.venv
+# Virtual environments
+.venv/
 venv/
-ENV/
 env/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
+ENV/
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
-.nox/
 
-# Logs
-*.log
-logs/
-
-# Environment variables
+# Environment / secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+*.pem
+*.key
 
-# Docker
-*.pid
-*.seed
-*.pid.lock
+# Runtime artifacts
+security_results/
+*.log
 
-# Distribution / packaging
-.Python
+# Tooling state
+.omc/
+.claude/settings.local.json
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp

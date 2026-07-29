@@ -1,66 +1,87 @@
 version: '3.8'
 
 services:
-  # Main application
-  web:
+  # Main API Service
+  api:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "8000:8000"
     environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=false
-      - LOG_LEVEL=DEBUG
-      - LOG_FORMAT=text
+      # Platform API Keys
+      - DARKAPI_URL=https://api.darkapi.io/v1
+      - DARKAPI_KEY=${DARKAPI_KEY}
+      - LLMSECURITY_URL=https://api.llmsecurity.dev/v1
+      - LLMSECURITY_KEY=${LLMSECURITY_KEY}
+      - MODELS2GO_URL=https://api.models2go.com/v1
+      - MODELS2GO_KEY=${MODELS2GO_KEY}
+      - APIPROXY_URL=https://api.apiproxy.app/v1
+      - APIPROXY_KEY=${APIPROXY_KEY}
+      # LLM Provider Keys
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      # Database
+      - DATABASE_URL=postgresql://promptgen:promptgen@postgres:5432/prompt_generator
       - REDIS_URL=redis://redis:6379/0
-      - CACHE_ENABLED=true
-      - RATE_LIMIT_ENABLED=true
-      - METRICS_ENABLED=true
-      - SECRET_KEY=dev-secret-change-in-production
     volumes:
-      - .:/app
+      - ./templates:/app/templates
     depends_on:
-      redis:
-        condition: service_healthy
-    command: gunicorn --reload --workers 2 --bind 0.0.0.0:5000 --log-level debug "app:create_app()"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
+      - postgres
+      - redis
+    networks:
+      - prompt-network
+    restart: unless-stopped
 
-  # Redis for caching and rate limiting
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=promptgen
+      - POSTGRES_PASSWORD=promptgen
+      - POSTGRES_DB=prompt_generator
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - prompt-network
+    restart: unless-stopped
+
+  # Redis for caching and job queue
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+    networks:
+      - prompt-network
+    restart: unless-stopped
 
-  # Nginx reverse proxy
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
+  # Security Tools Worker (runs Garak, ART, etc.)
+  security-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.security
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://promptgen:promptgen@postgres:5432/prompt_generator
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./security_results:/app/results
     depends_on:
-      web:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
+      - redis
+      - postgres
+    networks:
+      - prompt-network
+    restart: unless-stopped
 
 volumes:
+  postgres_data:
   redis_data:
-    driver: local
+
+networks:
+  prompt-network:
+    driver: bridge

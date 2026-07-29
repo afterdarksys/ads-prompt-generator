@@ -3,72 +3,32 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Prompt Generator Pro</title>
-<style>
-:root{--transition:all .3s ease}
-[data-theme=dark]{--bg-primary:#0b1020;--bg-secondary:#111a33;--bg-tertiary:#1a2744;--bg-input:#0c1329;--text-primary:#e6e9f2;--text-secondary:#b8c0d9;--border-color:rgba(255,255,255,.12);--border-subtle:rgba(255,255,255,.08);--accent-primary:#6c7cff;--accent-hover:#5a6de8;--accent-text:#0b1020;--error-color:#ffb3b3;--success-color:#4ade80;--shadow:rgba(0,0,0,.3)}
-[data-theme=light]{--bg-primary:#f5f7fa;--bg-secondary:#fff;--bg-tertiary:#f8fafc;--bg-input:#fff;--text-primary:#1a202c;--text-secondary:#4a5568;--border-color:rgba(0,0,0,.12);--border-subtle:rgba(0,0,0,.08);--accent-primary:#6c7cff;--accent-hover:#5a6de8;--accent-text:#fff;--error-color:#e53e3e;--success-color:#22c55e;--shadow:rgba(0,0,0,.1)}
-*{transition:background-color .3s ease,color .3s ease,border-color .3s ease;box-sizing:border-box}
-body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:var(--bg-primary);color:var(--text-primary)}
-.wrap{max-width:1200px;margin:0 auto;padding:24px 16px}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-h1{margin:0;font-size:28px}
-.theme-toggle{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:24px;padding:6px;display:flex;gap:4px;box-shadow:0 2px 8px var(--shadow)}
-.theme-toggle button{background:0 0;border:0;padding:8px 12px;border-radius:18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text-secondary);transition:var(--transition);display:flex;align-items:center;gap:6px}
-.theme-toggle button.active{background:var(--accent-primary);color:var(--accent-text)}
-.tabs{display:flex;gap:8px;background:var(--bg-secondary);border-radius:12px;padding:6px;margin-bottom:20px;box-shadow:0 2px 8px var(--shadow);overflow-x:auto}
-.tab{background:0 0;border:0;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;color:var(--text-secondary);transition:var(--transition);white-space:nowrap}
-.tab.active{background:var(--accent-primary);color:var(--accent-text)}
-.tab-content{display:none}
-.tab-content.active{display:block}
-.card{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:12px;padding:20px;box-shadow:0 4px 12px var(--shadow);margin-bottom:16px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-label{display:block;font-size:12px;color:var(--text-secondary);margin:10px 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-input,select,textarea{width:100%;background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border-color);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px}
-input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent-primary);box-shadow:0 0 0 3px rgba(108,124,255,.1)}
-textarea{min-height:96px;resize:vertical}
-button{background:var(--accent-primary);border:0;color:var(--accent-text);font-weight:700;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:14px;transition:var(--transition)}
-button:hover:not(:disabled){background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,124,255,.3)}
-button:active{transform:translateY(0)}
-button.secondary{background:0 0;color:var(--text-primary);border:1px solid var(--border-color)}
-button.secondary:hover:not(:disabled){background:var(--bg-input);border-color:var(--accent-primary)}
-button:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-.hint{font-size:12px;color:var(--text-secondary);margin-top:8px;font-style:italic}
-.error{color:var(--error-color);font-size:13px;margin-top:10px;font-weight:600}
-.success{color:var(--success-color);font-size:13px;margin-top:10px;font-weight:600}
-.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:20px}
-.prompt-card{background:var(--bg-tertiary);border:1px solid var(--border-subtle);border-radius:10px;padding:16px;cursor:pointer;transition:var(--transition)}
-.prompt-card:hover{border-color:var(--accent-primary);transform:translateY(-2px)}
-.prompt-card h3{margin:0 0 8px;font-size:16px}
-.prompt-card p{margin:0 0 12px;font-size:13px;color:var(--text-secondary)}
-.prompt-card .tags{display:flex;gap:6px;flex-wrap:wrap}
-.tag{background:var(--accent-primary);color:var(--accent-text);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
-.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
-.modal.active{display:flex}
-.modal-content{background:var(--bg-secondary);border-radius:12px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:24px}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.modal-header h2{margin:0}
-.close{background:0 0;border:0;font-size:24px;cursor:pointer;color:var(--text-secondary);padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px}
-.close:hover{background:var(--bg-input);color:var(--text-primary)}
-@media (max-width:860px){.row{grid-template-columns:1fr}.header{flex-direction:column;align-items:flex-start;gap:12px}.library-grid{grid-template-columns:1fr}}
-</style>
+<title>Prompt Generator Pro - Security Enhanced</title>
+<style>:root{--transition:all .3s ease}[data-theme=dark]{--bg-primary:#0b1020;--bg-secondary:#111a33;--bg-tertiary:#1a2744;--bg-input:#0c1329;--text-primary:#e6e9f2;--text-secondary:#b8c0d9;--border-color:rgba(255,255,255,.12);--border-subtle:rgba(255,255,255,.08);--accent-primary:#6c7cff;--accent-hover:#5a6de8;--accent-text:#0b1020;--error-color:#ffb3b3;--success-color:#4ade80;--warning-color:#fbbf24;--shadow:rgba(0,0,0,.3);--risk-low:#22c55e;--risk-medium:#f59e0b;--risk-high:#ef4444;--risk-critical:#dc2626}[data-theme=light]{--bg-primary:#f5f7fa;--bg-secondary:#fff;--bg-tertiary:#f8fafc;--bg-input:#fff;--text-primary:#1a202c;--text-secondary:#4a5568;--border-color:rgba(0,0,0,.12);--border-subtle:rgba(0,0,0,.08);--accent-primary:#6c7cff;--accent-hover:#5a6de8;--accent-text:#fff;--error-color:#e53e3e;--success-color:#22c55e;--warning-color:#d97706;--shadow:rgba(0,0,0,.1);--risk-low:#22c55e;--risk-medium:#f59e0b;--risk-high:#ef4444;--risk-critical:#dc2626}*{transition:background-color .3s ease,color .3s ease,border-color .3s ease;box-sizing:border-box}body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:var(--bg-primary);color:var(--text-primary)}.wrap{max-width:1400px;margin:0 auto;padding:24px 16px}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}h1{margin:0;font-size:28px}.header-subtitle{font-size:12px;color:var(--text-secondary);margin-top:4px}.theme-toggle{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:24px;padding:6px;display:flex;gap:4px;cursor:pointer;box-shadow:0 2px 8px var(--shadow)}.theme-toggle button{background:0 0;border:0;padding:8px 12px;border-radius:18px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text-secondary);transition:var(--transition);display:flex;align-items:center;gap:6px}.theme-toggle button.active{background:var(--accent-primary);color:var(--accent-text)}.tabs{display:flex;gap:8px;background:var(--bg-secondary);border-radius:12px;padding:6px;margin-bottom:20px;box-shadow:0 2px 8px var(--shadow);flex-wrap:wrap}.tab{background:0 0;border:0;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;color:var(--text-secondary);transition:var(--transition);display:flex;align-items:center;gap:6px}.tab.active{background:var(--accent-primary);color:var(--accent-text)}.tab.security{border-left:3px solid var(--warning-color)}.tab-content{display:none}.tab-content.active{display:block}.card{background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:12px;padding:20px;box-shadow:0 4px 12px var(--shadow);margin-bottom:16px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}label{display:block;font-size:12px;color:var(--text-secondary);margin:10px 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}input,select,textarea{width:100%;background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border-color);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent-primary);box-shadow:0 0 0 3px rgba(108,124,255,.1)}textarea{min-height:96px;resize:vertical}button{background:var(--accent-primary);border:0;color:var(--accent-text);font-weight:700;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:14px;transition:var(--transition)}button:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,124,255,.3)}button:active{transform:translateY(0)}button.secondary{background:0 0;color:var(--text-primary);border:1px solid var(--border-color)}button.secondary:hover{background:var(--bg-input);border-color:var(--accent-primary)}button.danger{background:var(--risk-high);color:#fff}button.warning{background:var(--warning-color);color:#000}button:disabled{opacity:.5;cursor:not-allowed;transform:none}.actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}.hint{font-size:12px;color:var(--text-secondary);margin-top:8px;font-style:italic}.error{color:var(--error-color);font-size:13px;margin-top:10px;font-weight:600}.success{color:var(--success-color);font-size:13px;margin-top:10px;font-weight:600}.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:20px}.prompt-card,.scan-card{background:var(--bg-tertiary);border:1px solid var(--border-subtle);border-radius:10px;padding:16px;cursor:pointer;transition:var(--transition)}.prompt-card:hover,.scan-card:hover{border-color:var(--accent-primary);transform:translateY(-2px)}.prompt-card h3,.scan-card h3{margin:0 0 8px;font-size:16px}.prompt-card p,.scan-card p{margin:0 0 12px;font-size:13px;color:var(--text-secondary)}.prompt-card .tags,.scan-card .tags{display:flex;gap:6px;flex-wrap:wrap}.tag{background:var(--accent-primary);color:var(--accent-text);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}.tag.risk-low{background:var(--risk-low)}.tag.risk-medium{background:var(--risk-medium);color:#000}.tag.risk-high{background:var(--risk-high)}.tag.risk-critical{background:var(--risk-critical)}.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}.modal.active{display:flex}.modal-content{background:var(--bg-secondary);border-radius:12px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:24px}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal-header h2{margin:0}.close{background:0 0;border:0;font-size:24px;cursor:pointer;color:var(--text-secondary);padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px}.close:hover{background:var(--bg-input);color:var(--text-primary)}.risk-badge{display:inline-block;padding:6px 12px;border-radius:6px;font-weight:700;font-size:12px;text-transform:uppercase}.risk-badge.low{background:var(--risk-low);color:#fff}.risk-badge.medium{background:var(--risk-medium);color:#000}.risk-badge.high{background:var(--risk-high);color:#fff}.risk-badge.critical{background:var(--risk-critical);color:#fff}.progress-bar{background:var(--bg-input);border-radius:8px;height:8px;overflow:hidden;margin:8px 0}.progress-bar-fill{height:100%;background:var(--accent-primary);transition:width .3s ease}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}.stat-card{background:var(--bg-tertiary);padding:16px;border-radius:8px;text-align:center}.stat-card .value{font-size:28px;font-weight:700;color:var(--accent-primary)}.stat-card .label{font-size:12px;color:var(--text-secondary);text-transform:uppercase}.checkbox-group{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0}.checkbox-item{display:flex;align-items:center;gap:6px;background:var(--bg-tertiary);padding:8px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border-subtle)}.checkbox-item:hover{border-color:var(--accent-primary)}.checkbox-item input{width:auto}.checkbox-item.checked{background:var(--accent-primary);color:var(--accent-text)}.platform-status{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.platform-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;background:var(--bg-tertiary)}.platform-badge .dot{width:8px;height:8px;border-radius:50%}.platform-badge .dot.online{background:var(--success-color)}.platform-badge .dot.offline{background:var(--error-color)}.platform-badge .dot.unknown{background:var(--text-secondary)}@media (max-width:860px){.row,.row-3{grid-template-columns:1fr}.header{flex-direction:column;align-items:flex-start;gap:12px}.tabs{overflow-x:auto}.library-grid{grid-template-columns:1fr}}</style>
 </head>
 <body data-theme="dark">
 <div class="wrap">
 <div class="header">
+<div>
 <h1>Prompt Generator Pro</h1>
+<div class="header-subtitle">Security-Enhanced Prompt Engineering Platform</div>
+</div>
 <div class="theme-toggle">
-<button id="theme-dark" class="active"><span>🌙</span><span>Dark</span></button>
-<button id="theme-light"><span>☀️</span><span>Light</span></button>
+<button id="theme-dark" class="active"><span>&#127769;</span><span>Dark</span></button>
+<button id="theme-light"><span>&#9728;&#65039;</span><span>Light</span></button>
 </div>
 </div>
+
 <div class="tabs">
-<button class="tab active" data-tab="generator">📝 Generator</button>
-<button class="tab" data-tab="playground">🎮 Playground</button>
-<button class="tab" data-tab="library">📚 Library</button>
-<button class="tab" data-tab="keys">🔑 API Keys</button>
+<button class="tab active" data-tab="generator">Generator</button>
+<button class="tab" data-tab="playground">Playground</button>
+<button class="tab" data-tab="library">Library</button>
+<button class="tab security" data-tab="security">Security Scan</button>
+<button class="tab security" data-tab="redteam">Red Team</button>
+<button class="tab" data-tab="keys">API Keys</button>
 </div>
+
+<!-- Generator Tab -->
 <div id="generator" class="tab-content active">
 <div class="card">
 <div class="row">
@@ -87,6 +47,7 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 <button id="generate">Generate</button>
 <button class="secondary" id="copy">Copy</button>
 <button class="secondary" id="save">Save to Library</button>
+<button class="warning" id="scan-generated" title="Scan generated prompt for security issues">Scan for Security</button>
 </div>
 <div class="error" id="gen-error" style="display:none"></div>
 <div class="success" id="gen-success" style="display:none"></div>
@@ -96,16 +57,17 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 </div>
 </div>
 </div>
+
+<!-- Playground Tab -->
 <div id="playground" class="tab-content">
 <div class="card">
-<h2 style="margin:0 0 16px">Test Prompts with AI Models</h2>
 <div class="row">
-<div><label for="pg-provider">Provider</label><select id="pg-provider"><option value="detached">Detached Mode (No API)</option><option value="anthropic">Anthropic Claude</option><option value="openai">OpenAI ChatGPT</option><option value="openrouter">OpenRouter</option></select></div>
+<div><label for="pg-provider">Provider</label><select id="pg-provider"><option value="detached">Detached Mode</option><option value="anthropic">Anthropic Claude</option><option value="openai">OpenAI ChatGPT</option><option value="openrouter">OpenRouter</option></select></div>
 <div><label for="pg-model">Model</label><select id="pg-model"><option value="detached">Detached</option></select></div>
 </div>
 <div class="row">
 <div><label for="pg-key-select">Stored API Key (optional)</label><select id="pg-key-select"><option value="">Use inline key or detached mode</option></select></div>
-<div><label for="pg-key-inline">Or Enter API Key</label><input id="pg-key-inline" type="password" placeholder="sk-..." autocomplete="off"/></div>
+<div><label for="pg-key-inline">Or Enter API Key</label><input id="pg-key-inline" type="password" placeholder="sk-..."/></div>
 </div>
 <label for="pg-prompt">Prompt to Test</label>
 <textarea id="pg-prompt" style="min-height:150px" placeholder="Enter your prompt here..."></textarea>
@@ -121,6 +83,8 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 <div id="pg-meta" style="margin-top:10px;font-size:12px;color:var(--text-secondary)"></div>
 </div>
 </div>
+
+<!-- Library Tab -->
 <div id="library" class="tab-content">
 <div class="card">
 <div class="row">
@@ -131,79 +95,516 @@ button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 </div>
 </div>
 </div>
-<div class="library-grid" id="library-grid"><p style="text-align:center;color:var(--text-secondary)">Loading...</p></div>
+<div class="library-grid" id="library-grid"></div>
 </div>
+
+<!-- Security Scan Tab -->
+<div id="security" class="tab-content">
+<div class="card">
+<h2 style="margin:0 0 8px">Prompt Security Scanner</h2>
+<p style="color:var(--text-secondary);margin:0 0 16px">Scan prompts for injection attacks, jailbreaks, data leaks, and other vulnerabilities.</p>
+
+<div class="platform-status" id="platform-status">
+<div class="platform-badge"><span class="dot unknown"></span>darkapi.io</div>
+<div class="platform-badge"><span class="dot unknown"></span>llmsecurity.dev</div>
+<div class="platform-badge"><span class="dot unknown"></span>models2go.com</div>
+</div>
+
+<label for="sec-prompt">Prompt to Scan</label>
+<textarea id="sec-prompt" style="min-height:150px" placeholder="Paste a prompt to analyze for security vulnerabilities..."></textarea>
+
+<label>Scan Types</label>
+<div class="checkbox-group" id="scan-types">
+<label class="checkbox-item checked"><input type="checkbox" value="injection" checked/> Prompt Injection</label>
+<label class="checkbox-item checked"><input type="checkbox" value="jailbreak" checked/> Jailbreak Detection</label>
+<label class="checkbox-item checked"><input type="checkbox" value="data_leak" checked/> Data Leak Risk</label>
+<label class="checkbox-item"><input type="checkbox" value="toxicity"/> Toxicity Check</label>
+</div>
+
+<div class="row">
+<div><label for="sec-target-model">Target Model (optional)</label><input id="sec-target-model" placeholder="e.g. gpt-4, claude-3"/></div>
+<div></div>
+</div>
+
+<div class="actions">
+<button id="sec-scan">Run Security Scan</button>
+<button class="secondary" id="sec-clear">Clear</button>
+</div>
+<div class="error" id="sec-error" style="display:none"></div>
+</div>
+
+<div class="card" id="sec-results" style="display:none">
+<h3 style="margin:0 0 16px">Scan Results</h3>
+<div id="sec-results-content"></div>
+</div>
+
+<div class="card">
+<h3 style="margin:0 0 16px">Recent Scans</h3>
+<div class="library-grid" id="sec-history"></div>
+</div>
+</div>
+
+<!-- Red Team Tab -->
+<div id="redteam" class="tab-content">
+<div class="card">
+<h2 style="margin:0 0 8px">LLM Red Team Testing</h2>
+<p style="color:var(--text-secondary);margin:0 0 16px">Automated adversarial testing using Garak, Promptmap2, PyRIT, and Promptfoo.</p>
+
+<label for="rt-prompt">System Prompt to Test</label>
+<textarea id="rt-prompt" style="min-height:150px" placeholder="Enter the system prompt you want to red team..."></textarea>
+
+<div class="row">
+<div><label for="rt-target-model">Target Model</label><select id="rt-target-model">
+<option value="gpt-4">GPT-4</option>
+<option value="gpt-4o">GPT-4o</option>
+<option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
+<option value="claude-3-opus">Claude 3 Opus</option>
+</select></div>
+<div><label for="rt-iterations">Iterations per Attack</label><input id="rt-iterations" type="number" value="5" min="1" max="50"/></div>
+</div>
+
+<label>Attack Types</label>
+<div class="checkbox-group" id="attack-types">
+<label class="checkbox-item checked"><input type="checkbox" value="jailbreak" checked/> Jailbreak</label>
+<label class="checkbox-item checked"><input type="checkbox" value="injection" checked/> Prompt Injection</label>
+<label class="checkbox-item"><input type="checkbox" value="extraction"/> System Prompt Extraction</label>
+<label class="checkbox-item"><input type="checkbox" value="harmful"/> Harmful Content</label>
+</div>
+
+<label>Tools to Use</label>
+<div class="checkbox-group" id="rt-tools">
+<label class="checkbox-item checked"><input type="checkbox" value="garak" checked/> Garak (NVIDIA)</label>
+<label class="checkbox-item checked"><input type="checkbox" value="promptmap2" checked/> Promptmap2</label>
+<label class="checkbox-item"><input type="checkbox" value="pyrit"/> PyRIT (Microsoft)</label>
+<label class="checkbox-item"><input type="checkbox" value="promptfoo"/> Promptfoo</label>
+</div>
+
+<div class="actions">
+<button id="rt-start" class="danger">Start Red Team Session</button>
+<button class="secondary" id="rt-clear">Clear</button>
+</div>
+<div class="error" id="rt-error" style="display:none"></div>
+</div>
+
+<div class="card" id="rt-results" style="display:none">
+<h3 style="margin:0 0 16px">Red Team Results</h3>
+<div class="stats-grid" id="rt-stats"></div>
+<div id="rt-results-content"></div>
+</div>
+
+<div class="card">
+<h3 style="margin:0 0 16px">Recent Sessions</h3>
+<div class="library-grid" id="rt-history"></div>
+</div>
+</div>
+
+<!-- API Keys Tab -->
 <div id="keys" class="tab-content">
 <div class="card">
 <h2 style="margin:0 0 16px">Add API Key</h2>
-<p style="color:var(--text-secondary);margin:0 0 16px;font-size:14px">Store your API keys securely (encrypted at rest). Keys are never logged or exposed.</p>
 <div class="row">
 <div><label for="key-provider">Provider</label><select id="key-provider"><option value="anthropic">Anthropic</option><option value="openai">OpenAI</option><option value="openrouter">OpenRouter</option></select></div>
 <div><label for="key-name">Key Name</label><input id="key-name" placeholder="e.g. My Claude Key"/></div>
 </div>
 <label for="key-value">API Key</label>
-<input id="key-value" type="password" placeholder="sk-..." autocomplete="off"/>
+<input id="key-value" type="password" placeholder="sk-..."/>
 <div class="actions">
 <button id="key-add">Add Key</button>
 </div>
 <div class="error" id="key-error" style="display:none"></div>
 <div class="success" id="key-success" style="display:none"></div>
 </div>
-<div class="card" id="keys-list"><p style="text-align:center;color:var(--text-secondary)">Loading...</p></div>
+<div class="card" id="keys-list"></div>
 </div>
+
 </div>
+
+<!-- Modal -->
 <div id="prompt-modal" class="modal">
 <div class="modal-content">
 <div class="modal-header">
-<h2 id="modal-title">Prompt Details</h2>
+<h2 id="modal-title">Details</h2>
 <button class="close" id="modal-close">&times;</button>
 </div>
 <div id="modal-body"></div>
 </div>
 </div>
+
 <script>
-const API='/api/v1';
-const theme={current:localStorage.getItem('theme')||'dark',toggle(t){this.current=t;localStorage.setItem('theme',t);document.body.setAttribute('data-theme',t);this.up()},up(){document.getElementById('theme-dark').classList.toggle('active',this.current==='dark');document.getElementById('theme-light').classList.toggle('active',this.current==='light')},init(){document.body.setAttribute('data-theme',this.current);this.up()}};
+const API_BASE='/api/v1';
+
+// Theme management
+const theme={current:localStorage.getItem('theme')||'dark',toggle(t){this.current=t;localStorage.setItem('theme',t);document.body.setAttribute('data-theme',t);this.updateButtons()},updateButtons(){document.getElementById('theme-dark').classList.toggle('active',this.current==='dark');document.getElementById('theme-light').classList.toggle('active',this.current==='light')},init(){document.body.setAttribute('data-theme',this.current);this.updateButtons()}};
 theme.init();
 document.getElementById('theme-dark').onclick=()=>theme.toggle('dark');
 document.getElementById('theme-light').onclick=()=>theme.toggle('light');
+
+// Tab management
 const tabs=document.querySelectorAll('.tab');
 const tabContents=document.querySelectorAll('.tab-content');
-tabs.forEach(tab=>{tab.onclick=()=>{tabs.forEach(t=>t.classList.remove('active'));tabContents.forEach(c=>c.classList.remove('active'));tab.classList.add('active');document.getElementById(tab.dataset.tab).classList.add('active');if(tab.dataset.tab==='library')loadLib();if(tab.dataset.tab==='keys')loadKeys();if(tab.dataset.tab==='playground')loadPgKeys()}});
+tabs.forEach(tab=>{tab.onclick=()=>{
+  tabs.forEach(t=>t.classList.remove('active'));
+  tabContents.forEach(c=>c.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById(tab.dataset.tab).classList.add('active');
+  if(tab.dataset.tab==='library')loadLibrary();
+  if(tab.dataset.tab==='keys')loadKeys();
+  if(tab.dataset.tab==='playground')loadPlaygroundKeys();
+  if(tab.dataset.tab==='security'){loadSecurityHistory();checkPlatformStatus();}
+  if(tab.dataset.tab==='redteam')loadRedTeamHistory();
+}});
+
+// Checkbox group handling
+document.querySelectorAll('.checkbox-group').forEach(group=>{
+  group.querySelectorAll('.checkbox-item input').forEach(cb=>{
+    cb.onchange=()=>cb.parentElement.classList.toggle('checked',cb.checked);
+  });
+});
+
+// Helper functions
+function setError(el,msg){if(!msg){el.style.display='none';el.textContent='';return}el.style.display='block';el.textContent=msg}
+function setSuccess(el,msg){if(!msg){el.style.display='none';el.textContent='';return}el.style.display='block';el.textContent=msg;setTimeout(()=>{el.style.display='none'},3000)}
+function escapeHtml(text){const div=document.createElement('div');div.textContent=text||'';return div.innerHTML}
+function getRiskClass(level){return level?'risk-'+level.toLowerCase():'risk-low'}
+
+// ============================================================================
+// GENERATOR
+// ============================================================================
 const els={target:document.getElementById('target'),tone:document.getElementById('tone'),task:document.getElementById('task'),context:document.getElementById('context'),constraints:document.getElementById('constraints'),deliverables:document.getElementById('deliverables'),generate:document.getElementById('generate'),copy:document.getElementById('copy'),save:document.getElementById('save'),output:document.getElementById('output'),genError:document.getElementById('gen-error'),genSuccess:document.getElementById('gen-success')};
-function err(el,m){el.style.display=m?'block':'none';el.textContent=m||''}
-function succ(el,m){el.style.display=m?'block':'none';el.textContent=m||'';if(m)setTimeout(()=>el.style.display='none',3000)}
-async function generate(){err(els.genError,'');els.generate.disabled=true;els.generate.textContent='Generating...';try{const r=await fetch(`${API}/generate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:els.target.value,tone:els.tone.value,task:els.task.value,context:els.context.value,constraints:els.constraints.value,deliverables:els.deliverables.value})});const d=await r.json();if(!r.ok){err(els.genError,d.error||'Failed');return}els.output.value=d.prompt||''}catch(e){err(els.genError,'Network error')}finally{els.generate.disabled=false;els.generate.textContent='Generate'}}
-async function copy(){const t=els.output.value;if(!t)return;try{await navigator.clipboard.writeText(t);succ(els.genSuccess,'Copied!')}catch(e){err(els.genError,'Copy failed')}}
-async function saveLib(){const p=els.output.value;if(!p){err(els.genError,'Generate first');return}try{const r=await fetch(`${API}/library/prompts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:els.task.value.substring(0,50)||'Untitled',task:els.task.value,target:els.target.value,context:els.context.value,constraints:els.constraints.value,deliverables:els.deliverables.value,tone:els.tone.value,generated_prompt:p})});const d=await r.json();if(!r.ok){err(els.genError,d.error||'Failed');return}succ(els.genSuccess,'Saved!')}catch(e){err(els.genError,'Save failed')}}
+
+async function generate(){
+  setError(els.genError,'');els.generate.disabled=true;els.generate.textContent='Generating...';
+  try{
+    const res=await fetch(`${API_BASE}/generate`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:els.target.value,tone:els.tone.value,task:els.task.value,context:els.context.value,constraints:els.constraints.value,deliverables:els.deliverables.value})});
+    const data=await res.json();
+    if(!res.ok){setError(els.genError,data.error||'Failed');return}
+    els.output.value=data.prompt||'';
+  }catch(e){setError(els.genError,'Network error')}
+  finally{els.generate.disabled=false;els.generate.textContent='Generate'}
+}
+
+async function copy(){const text=els.output.value;if(!text)return;try{await navigator.clipboard.writeText(text);setSuccess(els.genSuccess,'Copied!')}catch(e){setError(els.genError,'Copy failed')}}
+
+async function saveToLibrary(){
+  const prompt=els.output.value;
+  if(!prompt){setError(els.genError,'Generate a prompt first');return}
+  try{
+    const res=await fetch(`${API_BASE}/library/prompts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:els.task.value.substring(0,50),task:els.task.value,target:els.target.value,context:els.context.value,constraints:els.constraints.value,deliverables:els.deliverables.value,tone:els.tone.value,generated_prompt:prompt})});
+    const data=await res.json();
+    if(!res.ok){setError(els.genError,data.error||'Failed to save');return}
+    setSuccess(els.genSuccess,'Saved to library!');
+  }catch(e){setError(els.genError,'Save failed')}
+}
+
 els.generate.onclick=generate;
 els.copy.onclick=copy;
-els.save.onclick=saveLib;
+els.save.onclick=saveToLibrary;
+
+// Scan generated prompt
+document.getElementById('scan-generated').onclick=()=>{
+  const prompt=els.output.value;
+  if(!prompt){setError(els.genError,'Generate a prompt first');return}
+  document.getElementById('sec-prompt').value=prompt;
+  document.querySelector('[data-tab="security"]').click();
+};
+
+// ============================================================================
+// PLAYGROUND
+// ============================================================================
 const pg={provider:document.getElementById('pg-provider'),model:document.getElementById('pg-model'),keySelect:document.getElementById('pg-key-select'),keyInline:document.getElementById('pg-key-inline'),prompt:document.getElementById('pg-prompt'),execute:document.getElementById('pg-execute'),clear:document.getElementById('pg-clear'),response:document.getElementById('pg-response'),error:document.getElementById('pg-error'),meta:document.getElementById('pg-meta')};
 const models={detached:['detached'],anthropic:['claude-3-5-sonnet-20241022','claude-3-5-haiku-20241022','claude-3-opus-20240229'],openai:['gpt-4o','gpt-4o-mini','gpt-4-turbo','gpt-3.5-turbo'],openrouter:['anthropic/claude-3.5-sonnet','openai/gpt-4o','google/gemini-pro-1.5']};
-pg.provider.onchange=()=>{const p=pg.provider.value;const m=models[p]||['detached'];pg.model.innerHTML=m.map(x=>`<option value="${x}">${x}</option>`).join('')};
-async function loadPgKeys(){try{const r=await fetch(`${API}/keys`);const d=await r.json();pg.keySelect.innerHTML='<option value="">Use inline key or detached mode</option>'+d.keys.filter(k=>k.is_active).map(k=>`<option value="${k.id}">${k.key_name} (${k.provider})</option>`).join('')}catch(e){}}
-async function execPg(){err(pg.error,'');pg.execute.disabled=true;pg.execute.textContent='Executing...';try{const b={provider:pg.provider.value,model:pg.model.value,prompt:pg.prompt.value};if(pg.keySelect.value){b.key_id=parseInt(pg.keySelect.value)}else if(pg.keyInline.value){b.api_key=pg.keyInline.value}const r=await fetch(`${API}/playground/execute`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const d=await r.json();if(!r.ok){err(pg.error,d.error||'Failed');return}pg.response.value=d.response||d.message||'';if(d.tokens_used||d.duration_ms){pg.meta.textContent=`Model: ${d.model} | Tokens: ${d.tokens_used||'N/A'} | Time: ${d.duration_ms}ms`}}catch(e){err(pg.error,'Error')}finally{pg.execute.disabled=false;pg.execute.textContent='Execute'}}
-pg.execute.onclick=execPg;
+pg.provider.onchange=()=>{const provider=pg.provider.value;const modelList=models[provider]||['detached'];pg.model.innerHTML=modelList.map(m=>`<option value="${m}">${m}</option>`).join('')};
+
+async function loadPlaygroundKeys(){try{const res=await fetch(`${API_BASE}/keys`);const data=await res.json();pg.keySelect.innerHTML='<option value="">Use inline key or detached mode</option>'+data.keys.filter(k=>k.is_active).map(k=>`<option value="${k.id}">${k.key_name} (${k.provider})</option>`).join('')}catch(e){}}
+
+async function executePlayground(){
+  setError(pg.error,'');pg.execute.disabled=true;pg.execute.textContent='Executing...';
+  try{
+    const body={provider:pg.provider.value,model:pg.model.value,prompt:pg.prompt.value};
+    if(pg.keySelect.value)body.key_id=parseInt(pg.keySelect.value);
+    else if(pg.keyInline.value)body.api_key=pg.keyInline.value;
+    const res=await fetch(`${API_BASE}/playground/execute`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    if(!res.ok){setError(pg.error,data.error||'Execution failed');return}
+    pg.response.value=data.response||data.message||'';
+    if(data.tokens_used||data.duration_ms)pg.meta.textContent=`Model: ${data.model} | Tokens: ${data.tokens_used||'N/A'} | Time: ${data.duration_ms}ms`;
+  }catch(e){setError(pg.error,'Execution error')}
+  finally{pg.execute.disabled=false;pg.execute.textContent='Execute'}
+}
+pg.execute.onclick=executePlayground;
 pg.clear.onclick=()=>{pg.prompt.value='';pg.response.value='';pg.meta.textContent=''};
+
+// ============================================================================
+// LIBRARY
+// ============================================================================
 const lib={search:document.getElementById('lib-search'),refresh:document.getElementById('lib-refresh'),favorites:document.getElementById('lib-favorites'),grid:document.getElementById('library-grid')};
-let favOnly=false;
-async function loadLib(){try{const s=lib.search.value;const u=`${API}/library/prompts?${new URLSearchParams({search:s,favorites:favOnly})}`;const r=await fetch(u);const d=await r.json();lib.grid.innerHTML=d.prompts.length?d.prompts.map(p=>`<div class="prompt-card" onclick="showPrompt(${p.id})"><h3>${esc(p.name)}</h3><p>${esc(p.description||p.task.substring(0,100))}...</p><div class="tags">${p.tags.slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></div>`).join(''):'<p style="text-align:center;color:var(--text-secondary)">No prompts</p>'}catch(e){lib.grid.innerHTML='<p style="color:var(--error-color)">Load failed</p>'}}
-lib.refresh.onclick=loadLib;
-lib.search.oninput=()=>setTimeout(loadLib,300);
-lib.favorites.onclick=()=>{favOnly=!favOnly;lib.favorites.textContent=favOnly?'Show All':'Favorites Only';loadLib()};
-async function showPrompt(id){try{const r=await fetch(`${API}/library/prompts/${id}`);const d=await r.json();const p=d.prompt;document.getElementById('modal-title').textContent=p.name;document.getElementById('modal-body').innerHTML=`<p><strong>Target:</strong> ${p.target}</p><p><strong>Task:</strong> ${esc(p.task)}</p>${p.context?`<p><strong>Context:</strong> ${esc(p.context)}</p>`:''}${p.generated_prompt?`<div><label>Generated Prompt</label><textarea readonly style="min-height:200px">${esc(p.generated_prompt)}</textarea></div>`:''}<div class="actions"><button onclick="copyP('${esc(p.generated_prompt).replace(/'/g,"\\'")}')">Copy</button><button class="secondary" onclick="delPrompt(${id})">Delete</button><button class="secondary" onclick="closeMod()">Close</button></div>`;document.getElementById('prompt-modal').classList.add('active')}catch(e){}}
-function closeMod(){document.getElementById('prompt-modal').classList.remove('active')}
-function copyP(t){navigator.clipboard.writeText(t);alert('Copied!')}
-async function delPrompt(id){if(!confirm('Delete?'))return;try{await fetch(`${API}/library/prompts/${id}`,{method:'DELETE'});closeMod();loadLib()}catch(e){}}
-document.getElementById('modal-close').onclick=closeMod;
+let favoritesOnly=false;
+
+async function loadLibrary(){
+  try{
+    const search=lib.search.value;
+    const url=`${API_BASE}/library/prompts?${new URLSearchParams({search,favorites:favoritesOnly})}`;
+    const res=await fetch(url);const data=await res.json();
+    lib.grid.innerHTML=data.prompts.length?data.prompts.map(p=>`<div class="prompt-card" onclick="showPrompt(${p.id})"><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description||p.task.substring(0,100))}...</p><div class="tags">${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div></div>`).join(''):'<p style="text-align:center;color:var(--text-secondary)">No prompts found</p>';
+  }catch(e){lib.grid.innerHTML='<p style="color:var(--error-color)">Failed to load library</p>'}
+}
+lib.refresh.onclick=loadLibrary;
+lib.search.oninput=()=>setTimeout(loadLibrary,300);
+lib.favorites.onclick=()=>{favoritesOnly=!favoritesOnly;lib.favorites.textContent=favoritesOnly?'Show All':'Favorites Only';loadLibrary()};
+
+async function showPrompt(id){
+  try{
+    const res=await fetch(`${API_BASE}/library/prompts/${id}`);const data=await res.json();const p=data.prompt;
+    document.getElementById('modal-title').textContent=p.name;
+    document.getElementById('modal-body').innerHTML=`<p><strong>Target:</strong> ${p.target}</p><p><strong>Task:</strong> ${escapeHtml(p.task)}</p>${p.context?`<p><strong>Context:</strong> ${escapeHtml(p.context)}</p>`:''}${p.generated_prompt?`<div><label>Generated Prompt</label><textarea readonly style="min-height:200px">${escapeHtml(p.generated_prompt)}</textarea></div>`:''}<div class="actions"><button onclick="copyPrompt('${escapeHtml(p.generated_prompt).replace(/'/g,"\\'")}')">Copy</button><button class="secondary" onclick="deletePrompt(${id})">Delete</button><button class="secondary" onclick="closeModal()">Close</button></div>`;
+    document.getElementById('prompt-modal').classList.add('active');
+  }catch(e){}
+}
+function closeModal(){document.getElementById('prompt-modal').classList.remove('active')}
+function copyPrompt(text){navigator.clipboard.writeText(text);alert('Copied!')}
+async function deletePrompt(id){if(!confirm('Delete this prompt?'))return;try{await fetch(`${API_BASE}/library/prompts/${id}`,{method:'DELETE'});closeModal();loadLibrary()}catch(e){}}
+document.getElementById('modal-close').onclick=closeModal;
+
+// ============================================================================
+// API KEYS
+// ============================================================================
 const keys={provider:document.getElementById('key-provider'),name:document.getElementById('key-name'),value:document.getElementById('key-value'),add:document.getElementById('key-add'),list:document.getElementById('keys-list'),error:document.getElementById('key-error'),success:document.getElementById('key-success')};
-async function loadKeys(){try{const r=await fetch(`${API}/keys`);const d=await r.json();keys.list.innerHTML='<h3>Your API Keys</h3>'+(d.keys.length?d.keys.map(k=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:8px"><div><strong>${k.key_name}</strong> (${k.provider})<br><small>Added ${new Date(k.created_at).toLocaleDateString()}</small></div><button class="secondary" onclick="delKey(${k.id})">Delete</button></div>`).join(''):'<p style="text-align:center;color:var(--text-secondary)">No keys stored</p>')}catch(e){keys.list.innerHTML='<p style="color:var(--error-color)">Load failed</p>'}}
-async function addKey(){err(keys.error,'');succ(keys.success,'');if(!keys.name.value||!keys.value.value){err(keys.error,'Name and key required');return}try{const r=await fetch(`${API}/keys`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:keys.provider.value,key_name:keys.name.value,api_key:keys.value.value})});const d=await r.json();if(!r.ok){err(keys.error,d.error||'Failed');return}succ(keys.success,'Added!');keys.name.value='';keys.value.value='';loadKeys();loadPgKeys()}catch(e){err(keys.error,'Failed')}}
-async function delKey(id){if(!confirm('Delete?'))return;try{await fetch(`${API}/keys/${id}`,{method:'DELETE'});loadKeys();loadPgKeys()}catch(e){}}
+
+async function loadKeys(){
+  try{
+    const res=await fetch(`${API_BASE}/keys`);const data=await res.json();
+    keys.list.innerHTML='<h3>Your API Keys</h3>'+data.keys.map(k=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:8px"><div><strong>${k.key_name}</strong> (${k.provider})<br><small>Added ${new Date(k.created_at).toLocaleDateString()}</small></div><button class="secondary" onclick="deleteKey(${k.id})">Delete</button></div>`).join('');
+  }catch(e){}
+}
+
+async function addKey(){
+  setError(keys.error,'');setSuccess(keys.success,'');
+  if(!keys.name.value||!keys.value.value){setError(keys.error,'Name and key required');return}
+  try{
+    const res=await fetch(`${API_BASE}/keys`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({provider:keys.provider.value,key_name:keys.name.value,api_key:keys.value.value})});
+    const data=await res.json();
+    if(!res.ok){setError(keys.error,data.error||'Failed');return}
+    setSuccess(keys.success,'Key added!');keys.name.value='';keys.value.value='';loadKeys();loadPlaygroundKeys();
+  }catch(e){setError(keys.error,'Failed to add key')}
+}
+async function deleteKey(id){if(!confirm('Delete this key?'))return;try{await fetch(`${API_BASE}/keys/${id}`,{method:'DELETE'});loadKeys();loadPlaygroundKeys()}catch(e){}}
 keys.add.onclick=addKey;
-function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){if(document.querySelector('#generator').classList.contains('active'))generate()}})
+
+// ============================================================================
+// SECURITY SCAN
+// ============================================================================
+const sec={prompt:document.getElementById('sec-prompt'),targetModel:document.getElementById('sec-target-model'),scan:document.getElementById('sec-scan'),clear:document.getElementById('sec-clear'),error:document.getElementById('sec-error'),results:document.getElementById('sec-results'),resultsContent:document.getElementById('sec-results-content'),history:document.getElementById('sec-history')};
+
+async function checkPlatformStatus(){
+  try{
+    const res=await fetch(`${API_BASE}/platforms/status`);
+    const data=await res.json();
+    const statusEl=document.getElementById('platform-status');
+    statusEl.innerHTML=Object.entries(data.platforms).map(([name,info])=>`<div class="platform-badge"><span class="dot ${info.status}"></span>${name}</div>`).join('');
+  }catch(e){console.error('Failed to check platform status')}
+}
+
+async function runSecurityScan(){
+  const prompt=sec.prompt.value;
+  if(!prompt){setError(sec.error,'Enter a prompt to scan');return}
+
+  const scanTypes=Array.from(document.querySelectorAll('#scan-types input:checked')).map(cb=>cb.value);
+  if(scanTypes.length===0){setError(sec.error,'Select at least one scan type');return}
+
+  setError(sec.error,'');sec.scan.disabled=true;sec.scan.textContent='Scanning...';
+
+  try{
+    const res=await fetch(`${API_BASE}/security/scan`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,target_model:sec.targetModel.value,scan_types:scanTypes})});
+    const data=await res.json();
+    if(!res.ok){setError(sec.error,data.error||'Scan failed');return}
+
+    // Poll for results
+    pollScanStatus(data.scan_id);
+  }catch(e){setError(sec.error,'Scan failed')}
+  finally{sec.scan.disabled=false;sec.scan.textContent='Run Security Scan'}
+}
+
+async function pollScanStatus(scanId){
+  const poll=async()=>{
+    try{
+      const res=await fetch(`${API_BASE}/security/scan/${scanId}`);
+      const data=await res.json();
+      if(data.status==='completed'||data.status==='failed'){
+        displayScanResults(data);
+        loadSecurityHistory();
+      }else{
+        setTimeout(poll,1000);
+      }
+    }catch(e){}
+  };
+  poll();
+}
+
+function displayScanResults(scan){
+  sec.results.style.display='block';
+  const riskScore=scan.risk_score||{score:0,level:'low'};
+
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <span class="risk-badge ${riskScore.level}">Risk: ${riskScore.level.toUpperCase()} (${riskScore.score}/100)</span>
+    <span style="color:var(--text-secondary);font-size:12px">${scan.id}</span>
+  </div>`;
+
+  if(scan.results){
+    // Injection results
+    if(scan.results.injection){
+      const inj=scan.results.injection;
+      html+=`<div style="margin-bottom:16px;padding:12px;background:var(--bg-tertiary);border-radius:8px">
+        <h4 style="margin:0 0 8px">Prompt Injection</h4>
+        <span class="tag ${getRiskClass(inj.risk_level)}">${inj.risk_level}</span>
+        ${inj.patterns_found?.length?`<p style="margin:8px 0 0;font-size:13px">Patterns found: ${inj.patterns_found.join(', ')}</p>`:'<p style="margin:8px 0 0;color:var(--success-color)">No injection patterns detected</p>'}
+      </div>`;
+    }
+
+    // Data leak results
+    if(scan.results.data_leak){
+      const dl=scan.results.data_leak;
+      html+=`<div style="margin-bottom:16px;padding:12px;background:var(--bg-tertiary);border-radius:8px">
+        <h4 style="margin:0 0 8px">Data Leak Risk</h4>
+        <span class="tag ${getRiskClass(dl.risk_level)}">${dl.risk_level}</span>
+        ${dl.patterns_found?.length?`<p style="margin:8px 0 0;font-size:13px">Patterns found: ${dl.patterns_found.join(', ')}</p>`:'<p style="margin:8px 0 0;color:var(--success-color)">No data leak risks detected</p>'}
+      </div>`;
+    }
+
+    // Jailbreak results
+    if(scan.results.jailbreak){
+      const jb=scan.results.jailbreak;
+      html+=`<div style="margin-bottom:16px;padding:12px;background:var(--bg-tertiary);border-radius:8px">
+        <h4 style="margin:0 0 8px">Jailbreak Detection (llmsecurity.dev)</h4>
+        ${jb.status==='skipped'?`<p style="color:var(--text-secondary)">${jb.reason}</p>`:`<p>${JSON.stringify(jb)}</p>`}
+      </div>`;
+    }
+  }
+
+  sec.resultsContent.innerHTML=html;
+}
+
+async function loadSecurityHistory(){
+  try{
+    const res=await fetch(`${API_BASE}/security/scans?limit=10`);
+    const data=await res.json();
+    sec.history.innerHTML=data.scans.length?data.scans.map(s=>`<div class="scan-card" onclick="loadScanResult('${s.id}')">
+      <h3>${s.id}</h3>
+      <p>Status: ${s.status} | Types: ${s.scan_types?.join(', ')||'N/A'}</p>
+      <div class="tags">
+        <span class="tag ${getRiskClass(s.risk_score?.level||'low')}">${s.risk_score?.level||'pending'}</span>
+      </div>
+    </div>`).join(''):'<p style="color:var(--text-secondary)">No scans yet</p>';
+  }catch(e){}
+}
+
+async function loadScanResult(scanId){
+  try{
+    const res=await fetch(`${API_BASE}/security/scan/${scanId}`);
+    const data=await res.json();
+    displayScanResults(data);
+  }catch(e){}
+}
+
+sec.scan.onclick=runSecurityScan;
+sec.clear.onclick=()=>{sec.prompt.value='';sec.results.style.display='none'};
+
+// ============================================================================
+// RED TEAM
+// ============================================================================
+const rt={prompt:document.getElementById('rt-prompt'),targetModel:document.getElementById('rt-target-model'),iterations:document.getElementById('rt-iterations'),start:document.getElementById('rt-start'),clear:document.getElementById('rt-clear'),error:document.getElementById('rt-error'),results:document.getElementById('rt-results'),stats:document.getElementById('rt-stats'),resultsContent:document.getElementById('rt-results-content'),history:document.getElementById('rt-history')};
+
+async function startRedTeam(){
+  const prompt=rt.prompt.value;
+  if(!prompt){setError(rt.error,'Enter a system prompt to test');return}
+
+  const attackTypes=Array.from(document.querySelectorAll('#attack-types input:checked')).map(cb=>cb.value);
+  const tools=Array.from(document.querySelectorAll('#rt-tools input:checked')).map(cb=>cb.value);
+
+  if(attackTypes.length===0){setError(rt.error,'Select at least one attack type');return}
+  if(tools.length===0){setError(rt.error,'Select at least one tool');return}
+
+  setError(rt.error,'');rt.start.disabled=true;rt.start.textContent='Starting...';
+
+  try{
+    const res=await fetch(`${API_BASE}/redteam/session`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,target_model:rt.targetModel.value,attack_types:attackTypes,tools,iterations:parseInt(rt.iterations.value)})});
+    const data=await res.json();
+    if(!res.ok){setError(rt.error,data.error||'Failed to start session');return}
+
+    pollRedTeamStatus(data.session_id);
+  }catch(e){setError(rt.error,'Failed to start session')}
+  finally{rt.start.disabled=false;rt.start.textContent='Start Red Team Session'}
+}
+
+async function pollRedTeamStatus(sessionId){
+  const poll=async()=>{
+    try{
+      const res=await fetch(`${API_BASE}/redteam/session/${sessionId}`);
+      const data=await res.json();
+      if(data.status==='completed'||data.status==='failed'){
+        displayRedTeamResults(data);
+        loadRedTeamHistory();
+      }else{
+        setTimeout(poll,2000);
+      }
+    }catch(e){}
+  };
+  poll();
+}
+
+function displayRedTeamResults(session){
+  rt.results.style.display='block';
+
+  const vulnScore=session.vulnerability_score||0;
+
+  rt.stats.innerHTML=`
+    <div class="stat-card"><div class="value">${session.attacks_attempted||0}</div><div class="label">Attacks Run</div></div>
+    <div class="stat-card"><div class="value" style="color:var(--risk-high)">${session.attacks_successful||0}</div><div class="label">Successful</div></div>
+    <div class="stat-card"><div class="value">${vulnScore.toFixed(1)}%</div><div class="label">Vulnerability Score</div></div>
+  `;
+
+  let html=`<div style="margin-top:16px">`;
+
+  if(session.results){
+    Object.entries(session.results).forEach(([tool,result])=>{
+      html+=`<div style="margin-bottom:16px;padding:12px;background:var(--bg-tertiary);border-radius:8px">
+        <h4 style="margin:0 0 8px">${tool.toUpperCase()} Results</h4>
+        <pre style="margin:0;font-size:12px;overflow-x:auto">${JSON.stringify(result,null,2)}</pre>
+      </div>`;
+    });
+  }
+
+  html+=`</div>`;
+  rt.resultsContent.innerHTML=html;
+}
+
+async function loadRedTeamHistory(){
+  try{
+    const res=await fetch(`${API_BASE}/redteam/sessions?limit=10`);
+    const data=await res.json();
+    rt.history.innerHTML=data.sessions.length?data.sessions.map(s=>`<div class="scan-card" onclick="loadRedTeamResult('${s.id}')">
+      <h3>${s.id}</h3>
+      <p>Model: ${s.target_model} | Tools: ${s.tools?.join(', ')||'N/A'}</p>
+      <div class="tags">
+        <span class="tag">${s.attacks_successful||0}/${s.attacks_attempted||0} successful</span>
+        <span class="tag ${s.status==='completed'?'risk-low':'risk-medium'}">${s.status}</span>
+      </div>
+    </div>`).join(''):'<p style="color:var(--text-secondary)">No sessions yet</p>';
+  }catch(e){}
+}
+
+async function loadRedTeamResult(sessionId){
+  try{
+    const res=await fetch(`${API_BASE}/redteam/session/${sessionId}`);
+    const data=await res.json();
+    displayRedTeamResults(data);
+  }catch(e){}
+}
+
+rt.start.onclick=startRedTeam;
+rt.clear.onclick=()=>{rt.prompt.value='';rt.results.style.display='none'};
+
+// Keyboard shortcut
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){if(document.querySelector('#generator').classList.contains('active'))generate()}});
 </script>
 </body>
 </html>
