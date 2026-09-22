@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pyperclip
 
-from prompt_gen.core import PromptRequest, PromptTarget, generate_prompt
+from prompt_gen.core import PromptRequest, PromptTarget, generate_prompt, list_profiles
 
 
 class PromptGenConsole(cmd.Cmd):
@@ -55,6 +55,11 @@ class PromptGenConsole(cmd.Cmd):
             return
         self._state[field] = value
         print("ok")
+
+    def do_targets(self, arg: str) -> None:
+        for profile in list_profiles():
+            print(f"{profile.id}\t{profile.label}")
+            print(f"  {profile.summary}")
 
     def do_target(self, arg: str) -> None:
         raw = (arg or "").strip()

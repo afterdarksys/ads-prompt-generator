@@ -6,12 +6,14 @@ import sys
 from pathlib import Path
 
 from prompt_gen.console import PromptGenConsole
-from prompt_gen.core import PromptRequest, PromptTarget, generate_prompt
+from prompt_gen.core import PromptRequest, PromptTarget, generate_prompt, list_profiles
 
 
 def build_parser() -> argparse.ArgumentParser:
+    names = ", ".join(profile.id for profile in list_profiles())
     p = argparse.ArgumentParser(prog="prompt-gen")
-    p.add_argument("--target", default="chatgpt", help="chatgpt | claude_code")
+    p.add_argument("--target", default="chatgpt", help=f"one of: {names}")
+    p.add_argument("--list-targets", action="store_true", help="Print model targets and exit")
     p.add_argument("--task", default="", help="Required unless --console")
     p.add_argument("--context", default="")
     p.add_argument("--constraints", default="")
@@ -30,6 +32,11 @@ def _write_out(path: str, text: str) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+
+    if args.list_targets:
+        for profile in list_profiles():
+            print(f"{profile.id}\t{profile.label}\t{profile.summary}")
+        return 0
 
     if args.console:
         PromptGenConsole().cmdloop()

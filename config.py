@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -42,7 +42,9 @@ class Config:
     METRICS_ENABLED: bool = os.getenv("METRICS_ENABLED", "true").lower() in ("true", "1", "yes")
 
     # CORS
-    CORS_ORIGINS: list[str] = os.getenv("CORS_ORIGINS", "*").split(",")
+    CORS_ORIGINS: list[str] = field(
+        default_factory=lambda: os.getenv("CORS_ORIGINS", "*").split(",")
+    )
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./prompt_generator.db")

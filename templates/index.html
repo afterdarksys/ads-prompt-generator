@@ -32,7 +32,29 @@
 <div id="generator" class="tab-content active">
 <div class="card">
 <div class="row">
-<div><label for="target">Target</label><select id="target"><option value="chatgpt">ChatGPT</option><option value="claude_code">Claude Code</option></select></div>
+<div><label for="target">Target</label><select id="target">
+<optgroup label="OpenAI">
+<option value="chatgpt" selected data-summary="Labeled sections as delimiters, a fixed format, and clarifying questions only when required.">ChatGPT</option>
+<option value="gpt_reasoning" data-summary="Short and direct. No chain-of-thought instructions; these models reason internally.">OpenAI reasoning (o-series)</option>
+</optgroup>
+<optgroup label="Anthropic">
+<option value="claude_chat" data-summary="XML-tagged sections Claude can tell apart, with direct instructions.">Claude</option>
+<option value="claude_code" data-summary="Smallest correct change, no invented APIs, plan then implement.">Claude Code</option>
+</optgroup>
+<optgroup label="Google">
+<option value="gemini" data-summary="Complete task first, hard constraints, and an exact output format.">Gemini</option>
+</optgroup>
+<optgroup label="xAI">
+<option value="grok" data-summary="Direct instructions and a fixed format, without an extra persona.">Grok</option>
+</optgroup>
+<optgroup label="Open models">
+<option value="llama" data-summary="Short headings, and the output contract repeated at the end.">Llama</option>
+<option value="deepseek" data-summary="A concrete spec and success criteria, with no unnamed dependencies.">DeepSeek</option>
+<option value="deepseek_r1" data-summary="One user message, no examples, and no step-by-step instruction. Math results go in \boxed{}.">DeepSeek R1</option>
+<option value="mistral" data-summary="Imperative instructions, constraints in order, and a hard stop.">Mistral</option>
+</optgroup>
+</select>
+<p class="hint" id="target-hint"></p></div>
 <div><label for="tone">Tone (optional)</label><input id="tone" placeholder="e.g. concise, direct"/></div>
 </div>
 <label for="task">Task (required)</label>
@@ -271,6 +293,9 @@ function getRiskClass(level){return level?'risk-'+level.toLowerCase():'risk-low'
 // GENERATOR
 // ============================================================================
 const els={target:document.getElementById('target'),tone:document.getElementById('tone'),task:document.getElementById('task'),context:document.getElementById('context'),constraints:document.getElementById('constraints'),deliverables:document.getElementById('deliverables'),generate:document.getElementById('generate'),copy:document.getElementById('copy'),save:document.getElementById('save'),output:document.getElementById('output'),genError:document.getElementById('gen-error'),genSuccess:document.getElementById('gen-success')};
+const targetHint=document.getElementById('target-hint');
+function showTargetHint(){const opt=els.target.selectedOptions[0];targetHint.textContent=opt?(opt.dataset.summary||''):'';}
+els.target.addEventListener('change',showTargetHint);showTargetHint();
 
 async function generate(){
   setError(els.genError,'');els.generate.disabled=true;els.generate.textContent='Generating...';

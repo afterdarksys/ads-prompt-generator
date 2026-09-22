@@ -170,9 +170,9 @@
         "properties": {
           "target": {
             "type": "string",
-            "enum": ["chatgpt", "claude_code"],
+            "enum": ["chatgpt", "gpt_reasoning", "claude_chat", "claude_code", "gemini", "grok", "llama", "deepseek", "deepseek_r1", "mistral"],
             "default": "chatgpt",
-            "description": "Target AI model for the prompt"
+            "description": "Target model. Aliases such as gpt-4o, o3, claude, grok-4, and sonnet are accepted and normalized. claude still means Claude Code; use claude_chat for Claude chat."
           },
           "task": {
             "type": "string",

@@ -2,21 +2,30 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, Field, field_validator
-from typing_extensions import Literal
 
 from config import config
 from errors import ValidationError
+from prompt_gen.core import PromptTarget
 
 
 class GenerateRequest(BaseModel):
     """Request schema for prompt generation."""
 
-    target: Literal["chatgpt", "claude_code"] = "chatgpt"
+    target: str = "chatgpt"
     task: str = Field(..., min_length=1, max_length=config.MAX_TASK_LENGTH)
     context: str = Field(default="", max_length=config.MAX_CONTEXT_LENGTH)
     constraints: str = Field(default="", max_length=config.MAX_FIELD_LENGTH)
     deliverables: str = Field(default="", max_length=config.MAX_FIELD_LENGTH)
     tone: str = Field(default="", max_length=config.MAX_TONE_LENGTH)
+
+    @field_validator("target")
+    @classmethod
+    def known_target(cls, v: str) -> str:
+        """Accept aliases and store the canonical target id."""
+        try:
+            return PromptTarget.from_string(v).value
+        except ValueError as exc:
+            raise ValueError(str(exc)) from exc
 
     @field_validator("task")
     @classmethod

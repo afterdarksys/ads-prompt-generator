@@ -18,7 +18,7 @@ from config import config
 from errors import PromptGeneratorError, RateLimitError, ValidationError
 from logging_config import get_logger, setup_logging
 from models import init_db
-from prompt_gen.core import PromptRequest, PromptTarget, generate_prompt
+from prompt_gen.core import PromptRequest, PromptTarget, generate_prompt, list_profiles
 from routes_library import library_bp
 from routes_playground import keys_bp, playground_bp
 from validation import validate_generate_request
@@ -306,6 +306,24 @@ def _setup_routes(app: Flask) -> None:
                 }
             ),
             status_code,
+        )
+
+    @app.get("/api/v1/targets")
+    def api_targets():
+        """List prompt targets and the optimization applied to each."""
+        return jsonify(
+            {
+                "targets": [
+                    {
+                        "id": profile.id,
+                        "label": profile.label,
+                        "family": profile.family,
+                        "summary": profile.summary,
+                        "structure": profile.structure,
+                    }
+                    for profile in list_profiles()
+                ]
+            }
         )
 
     @app.post("/api/v1/generate")

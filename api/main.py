@@ -33,6 +33,14 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import structlog
 
+from prompt_gen.core import (
+    PromptRequest,
+    PromptTarget,
+    engineer_system,
+    generate_prompt as render_prompt,
+    list_profiles as model_profiles,
+)
+
 # Configure logging
 structlog.configure(
     processors=[
@@ -126,7 +134,10 @@ app.add_middleware(
 # ============================================================================
 
 class GenerateRequest(BaseModel):
-    target: str = Field(..., description="Target platform: chatgpt or claude_code")
+    target: str = Field(
+        default="chatgpt",
+        description="Target model id. See GET /api/v1/targets.",
+    )
     task: str = Field(..., min_length=1, description="What the model should do")
     tone: Optional[str] = None
     context: Optional[str] = None
@@ -298,33 +309,37 @@ def prompt_storage_error(operation: str, error: Exception) -> HTTPException:
 # PROMPT GENERATION ENDPOINTS
 # ============================================================================
 
-@app.post("/api/v1/generate")
-async def generate_prompt(req: GenerateRequest):
-    """Generate an optimized prompt for the target platform"""
+@app.get("/api/v1/targets")
+async def list_targets():
+    """List prompt targets and the optimization applied to each."""
+    return {
+        "targets": [
+            {
+                "id": profile.id,
+                "label": profile.label,
+                "family": profile.family,
+                "summary": profile.summary,
+                "structure": profile.structure,
+            }
+            for profile in model_profiles()
+        ]
+    }
 
-    if not req.task:
+
+@app.post("/api/v1/generate")
+async def generate_prompt_endpoint(req: GenerateRequest):
+    """Generate an optimized prompt for the target model."""
+
+    if not req.task or not req.task.strip():
         raise HTTPException(400, "Task is required")
 
-    # Build the meta-prompt based on target
-    if req.target == "claude_code":
-        system = """You are an expert prompt engineer specializing in Claude Code prompts.
-Generate a highly effective prompt that:
-- Uses Claude Code's strengths (tool use, file operations, bash commands)
-- Is specific and actionable
-- Includes clear success criteria
-- Follows best practices for agentic coding assistants"""
-    else:
-        system = """You are an expert prompt engineer for ChatGPT.
-Generate a highly effective prompt that:
-- Is clear and specific
-- Provides necessary context
-- Defines expected output format
-- Uses appropriate tone and constraints"""
+    try:
+        target = PromptTarget.from_string(req.target)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
 
-    user_content = f"""Create an optimized prompt for the following:
-
-TASK: {req.task}
-"""
+    system = engineer_system(target)
+    user_content = f"Create an optimized prompt for the following:\n\nTASK: {req.task.strip()}\n"
     if req.tone:
         user_content += f"\nTONE: {req.tone}"
     if req.context:
@@ -333,8 +348,18 @@ TASK: {req.task}
         user_content += f"\nCONSTRAINTS: {req.constraints}"
     if req.deliverables:
         user_content += f"\nDELIVERABLES: {req.deliverables}"
-
     user_content += "\n\nGenerate only the optimized prompt, no explanations."
+
+    local_prompt = render_prompt(
+        PromptRequest(
+            target=target,
+            task=req.task,
+            context=req.context or "",
+            constraints=req.constraints or "",
+            deliverables=req.deliverables or "",
+            tone=req.tone or "",
+        )
+    )
 
     # Use Anthropic API for generation
     if config.ANTHROPIC_API_KEY:
@@ -355,13 +380,12 @@ TASK: {req.task}
             )
             data = response.json()
             generated = data.get("content", [{}])[0].get("text", "")
-            return {"prompt": generated}
+            if generated.strip():
+                return {"prompt": generated, "target": target.value, "source": "model"}
         except Exception as e:
             log.error("generation_failed", error=str(e))
-            raise HTTPException(500, f"Generation failed: {str(e)}")
 
-    # Fallback: return a template
-    return {"prompt": f"[Generated prompt for: {req.task}]\n\n{user_content}"}
+    return {"prompt": local_prompt, "target": target.value, "source": "template"}
 
 # ============================================================================
 # PLAYGROUND ENDPOINTS

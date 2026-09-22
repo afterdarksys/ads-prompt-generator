@@ -90,6 +90,26 @@ class TestGenerateEndpoint:
         data = response.get_json()
         assert "error" in data
 
+    def test_generate_alias_uses_that_models_shape(self, client):
+        """An alias selects that model's optimizations."""
+        response = client.post(
+            "/api/v1/generate",
+            json={"target": "o3", "task": "Add 2 and 2"},
+        )
+        assert response.status_code == 200
+        prompt = response.get_json()["prompt"].lower()
+        assert "think step by step" not in prompt
+        assert "you are" not in prompt
+
+    def test_list_targets(self, client):
+        """The catalog exposes one entry per profile."""
+        response = client.get("/api/v1/targets")
+        assert response.status_code == 200
+        ids = {item["id"] for item in response.get_json()["targets"]}
+        assert "chatgpt" in ids
+        assert "grok" in ids
+        assert "deepseek_r1" in ids
+
     def test_generate_invalid_target(self, client):
         """Test error with invalid target."""
         response = client.post(

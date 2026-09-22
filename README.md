@@ -4,12 +4,27 @@ Prompt Generator Pro — a security-enhanced prompt engineering platform. Genera
 
 ## Features
 
-- **Prompt generation** — target-aware meta-prompting for ChatGPT and Claude Code
+- **Prompt generation** — one request, shaped per target model (ChatGPT, OpenAI o-series, Claude, Claude Code, Gemini, Grok, Llama, DeepSeek, DeepSeek R1, Mistral)
 - **Prompt library** — PostgreSQL-backed persistence with search and favorites
 - **Playground** — execute prompts against Anthropic, OpenAI, or OpenRouter (plus a detached no-call mode)
 - **Security scanning** — prompt injection, jailbreak, data-leak, and toxicity checks with a composite risk score
 - **Red team sessions** — orchestration hooks for Garak, Promptmap2, PyRIT, and Promptfoo
 - **ART attacks** — adversarial evasion, poisoning, extraction, and inference testing against served models
+
+`claude` is still Claude Code. Claude chat is `claude_chat` (aliases: `sonnet`, `opus`, `haiku`). Other aliases include `gpt-4o`, `o3`, `grok-4`, and `deepseek-r1`. `GET /api/v1/targets` lists every id and the optimization applied to it.
+
+| Target | What changes in the prompt |
+|---|---|
+| `chatgpt` | Labeled sections, a fixed answer format, questions only when required |
+| `gpt_reasoning` | A short user message. No persona and no request to show reasoning |
+| `claude_chat` | XML tags, and instructions that refer to those tags by name |
+| `claude_code` | Smallest correct change, read files first, no invented APIs |
+| `gemini` | Task stays narrow, constraints are requirements, format is exact |
+| `grok` | Direct tone, one persona, stop when the format is done |
+| `llama` | Short headings, output contract repeated at the end |
+| `deepseek` | The deliverable itself, and no libraries the constraints did not name |
+| `deepseek_r1` | One user message, no examples. Math results go in `\boxed{}` |
+| `mistral` | Imperative instructions, constraints in order, no trailing alternatives |
 
 ## Platform integrations
 
